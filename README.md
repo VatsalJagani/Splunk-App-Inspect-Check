@@ -47,7 +47,7 @@ graph TD
 * The action automatically generates build artifact from GitHub repo.
 
 ```
-- uses: VatsalJagani/splunk-app-action@v3
+- uses: VatsalJagani/splunk-app-action@v4
   with:
     app_dir: "my_app"
 ```
@@ -57,11 +57,11 @@ graph TD
 
 * Supports multiple Apps/Add-ons in single repository.
     ```
-    - uses: VatsalJagani/splunk-app-action@v3
+    - uses: VatsalJagani/splunk-app-action@v4
       with:
         app_dir: "my_splunk_app"
 
-    - uses: VatsalJagani/splunk-app-action@v3
+    - uses: VatsalJagani/splunk-app-action@v4
       with:
         app_dir: "my_splunk_add-on"
     ```
@@ -87,7 +87,7 @@ graph TD
         * Alternatively you can use `Running User Defined Commands Before Generating the final App Build` section here to see how you can assign right permission for your App/Add-on.
     * You can add `to_make_permission_changes: true` parameter to fix the issues with file and folder permissions to avoid App-inspect check automatically.
         ```
-        - uses: VatsalJagani/splunk-app-action@v3
+        - uses: VatsalJagani/splunk-app-action@v4
           with:
             app_dir: "my_app"
             to_make_permission_changes: true
@@ -109,7 +109,7 @@ graph TD
 
     * If you wish to run the user defined linux commands before generating the App build, set the environment variables `SPLUNK_APP_ACTION_<n>`.
         ```
-        - uses: VatsalJagani/splunk-app-action@v3
+        - uses: VatsalJagani/splunk-app-action@v4
           env:
             SPLUNK_APP_ACTION_1: "find . -type f -exec chmod 644 '{}' \\;"
             SPLUNK_APP_ACTION_2: "find . -type f -name '*.sh' -exec chmod +x '{}' \\;"
@@ -125,7 +125,7 @@ graph TD
     * It allows you to run command before building the App build.
         * This could be useful if you wish to remove some files that you don't want in the build, change permission of some files before running the rest of the app build or app-inspect check.
         ```
-        - uses: VatsalJagani/splunk-app-action@v3
+        - uses: VatsalJagani/splunk-app-action@v4
           env:
             SPLUNK_APP_ACTION_1: "rm -rf extra_test_folder"
           with:
@@ -148,7 +148,7 @@ graph TD
 * It requires to set inputs: splunkbase_username and splunkbase_password.
 
 ```
-- uses: VatsalJagani/splunk-app-action@v3
+- uses: VatsalJagani/splunk-app-action@v4
   with:
     app_dir: "my_app"
     splunkbase_username: ${{ secrets.SPLUNKBASE_USERNAME }}
@@ -165,7 +165,7 @@ graph TD
 #### `whats_in_the_app` - Utility that adds information about the App inside the README.md file
 * The splunk-app-action has utility which automatically adds information about the App, like how many alerts does it have, how many dashboards does it have, etc inside the App's README.md file.
 ```
-- uses: VatsalJagani/splunk-app-action@v3
+- uses: VatsalJagani/splunk-app-action@v4
   with:
     app_dir: "my_app"
     app_utilities: "whats_in_the_app"
@@ -176,7 +176,7 @@ graph TD
 * Auto adds python logger manager, including python file necessary, props.conf to assign right sourcetype for it under the internal logs.
 
 ```
-- uses: VatsalJagani/splunk-app-action@v3
+- uses: VatsalJagani/splunk-app-action@v4
   with:
     app_dir: "my_app"
     app_utilities: "logger"
@@ -188,19 +188,31 @@ graph TD
 #### `splunk_python_sdk` - Add Splunklib or Splunk SDK for Python and Auto Upgrades It
 * This utility adds the splunklib or Splunk SDK for Python to the App and auto upgrades it whenever new version is available.
 
+Example-1
 ```
-- uses: VatsalJagani/splunk-app-action@v3
+- uses: VatsalJagani/splunk-app-action@v4
   with:
     app_dir: "my_app"
     app_utilities: "splunk_python_sdk"
     my_github_token: ${{ secrets.MY_GITHUB_TOKEN }}
 ```
 
+Example-2
+```
+- uses: VatsalJagani/splunk-app-action@v4
+  with:
+    app_dir: "my_app"
+    app_utilities: "splunk_python_sdk"
+    my_github_token: ${{ secrets.MY_GITHUB_TOKEN }}
+    splunk_python_sdk_install_path: "bin/lib"
+```
+
+
 #### `common_js_utilities` - Add Common JavaScript Utilities File
 * This utility adds a JavaScript file that contains commonly used functionality for a JavaScript code for a Splunk App.
 
 ```
-- uses: VatsalJagani/splunk-app-action@v3
+- uses: VatsalJagani/splunk-app-action@v4
   with:
     app_dir: "my_app"
     app_utilities: "common_js_utilities"
@@ -211,7 +223,7 @@ graph TD
 * This utility adds additional_packaging.py file that contains code to better generate input handler python file to easily re-generate code on change, rather than making manual changes.
 
 ```
-- uses: VatsalJagani/splunk-app-action@v3
+- uses: VatsalJagani/splunk-app-action@v4
   with:
     app_dir: "."
     use_ucc_gen: true
@@ -287,6 +299,18 @@ def stream_events(input_script: smi.Script, inputs: smi.InputDefinition, event_w
 * description: "Sourcetype for the internal app logs. Required only for logger utility."
 * required: false
 
+#### splunk_python_sdk_install_path
+* description: "Path where you would like to install splunk-python-sdk (splunklib). Path is relative to App's root folder."
+* required: false
+* default: "bin"
+
+#### is_remove_pyc_from_splunklib_dir
+* description: "Remove `.pyc` files and `__pycache__` directory from splunk-python-sdk (splunklib) installation path before generating Pull Request. Do not turn this off unless you are facing any issues explicitly."
+* required: false
+* default: true
+
+
+
 
 
 ## Troubleshooting
@@ -309,6 +333,11 @@ def stream_events(input_script: smi.Script, inputs: smi.InputDefinition, event_w
 
 ## Release Notes
 
+### v4.1
+* Added `splunk_python_sdk_install_path` parameter for `splunk_python_sdk` utility. Default value is still `bin` folder, but now user can change based on their needs.
+* Avoid `.pyc` files and `__pycache__` files getting into `splunk_python_sdk` installation folder and getting into Pull Request by default. You can turn this off with `is_remove_pyc_from_splunklib_dir` parameter.
+
+
 ### v4
 * Run the user-defined commands in the context of your App's root directory instead of Repo's root directory. Refer to `Running User Defined Commands Before Generating the final App Build` for more details.
 
@@ -322,7 +351,7 @@ def stream_events(input_script: smi.Script, inputs: smi.InputDefinition, event_w
 * From `v4` of the `splunk-app-action`, your user-defined custom command (Refer to `Running User Defined Commands Before Generating the final App Build` section) would run in a context of your App's folder instead of root folder.
     * So you need to change the code from this:
         ```
-        - uses: VatsalJagani/splunk-app-action@v3
+        - uses: VatsalJagani/splunk-app-action@v4
           env:
             SPLUNK_APP_ACTION_1: "rm -rf my_app/extra_test_folder"
             SPLUNK_APP_ACTION_2: "cat 'abc,123' >> my_app/lookups/my_custom_lookup.csv"
@@ -331,7 +360,7 @@ def stream_events(input_script: smi.Script, inputs: smi.InputDefinition, event_w
         ```
         * to
         ```
-        - uses: VatsalJagani/splunk-app-action@v3
+        - uses: VatsalJagani/splunk-app-action@v4
           env:
             SPLUNK_APP_ACTION_1: "rm -rf extra_test_folder"
             SPLUNK_APP_ACTION_2: "cat 'abc,123' >> lookups/my_custom_lookup.csv"

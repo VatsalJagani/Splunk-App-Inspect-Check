@@ -54,6 +54,17 @@ inputs:
     required: false
     default: "NONE"
 
+  splunk_python_sdk_install_path:
+    description: "Path where you would like to install splunk-python-sdk (splunklib). Path is relative to App's root folder."
+    required: false
+    default: "bin"
+
+  is_remove_pyc_from_splunklib_dir:
+    description: "Remove `.pyc` files and `__pycache__` directory from splunk-python-sdk (splunklib) installation path before generating Pull Request. Do not turn this off unless you are facing any issues explicitly."
+    required: false
+    default: true
+
+
 outputs:
   stdout:
     description: "Program stdout"
@@ -92,6 +103,8 @@ runs:
         echo "current_branch_name -> ${{steps.extract_branch.outputs.branch}}"
         echo "logger_log_files_prefix -> ${{inputs.logger_log_files_prefix}}"
         echo "logger_sourcetype -> ${{inputs.logger_sourcetype}}"
+        echo "splunk_python_sdk_install_path -> ${{inputs.splunk_python_sdk_install_path}}"
+        echo "is_remove_pyc_from_splunklib_dir -> ${{inputs.is_remove_pyc_from_splunklib_dir}}"
 
     - name: "Install Python"
       uses: actions/setup-python@v5
@@ -118,6 +131,8 @@ runs:
         SPLUNK_current_branch_name: ${{steps.extract_branch.outputs.branch}}
         SPLUNK_logger_log_files_prefix: ${{inputs.logger_log_files_prefix}}
         SPLUNK_logger_sourcetype: ${{inputs.logger_sourcetype}}
+        SPLUNK_splunk_python_sdk_install_path: ${{inputs.splunk_python_sdk_install_path}}
+        SPLUNK_is_remove_pyc_from_splunklib_dir: ${{inputs.is_remove_pyc_from_splunklib_dir}}
       run: |
         python -u ${{ github.action_path }}/src/main.py
 

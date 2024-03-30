@@ -1,17 +1,11 @@
-# README for Developers
+# README for Developers of this action
 
 * Fork the project and submit a Pull Request if you would like to contribute to the project.
 
 * Automated tests for the GitHub action present in the separate repo here [splunk-app-action-test-app](https://github.com/VatsalJagani/splunk-app-action-test-app)
 
 
-## How to Run Locally
-```
-python3 src/main.py local_test
-```
-
-
-# Notes for author
+## How to generate tag
 
 * Create a new tag and push the tag from git:
   ```
@@ -33,13 +27,12 @@ python3 src/main.py local_test
   ```
 
 
-* Run below command to install all node JS dependencies.
-  * `npm install`
-
-* Run below command if you make any changes to JS file before committing the code to repo.
-  * `ncc build index.js --license LICENSE`
-  * This do not require if there is change in python file or action.yml file.
-
+## How to run python test-cases locally
+```
+python -m pip install --upgrade pip
+python -m pip install -r tests/requirements.txt
+pytest tests --junitxml=junit/test-results.xml --cov=src --cov-config=tests/.coveragerc --cov-report=xml
+```
 
 
 ## Note from actions/upload-artifact - Zipped Artifact Downloads

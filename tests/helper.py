@@ -17,7 +17,9 @@ def setup_action_yml(test_app_repo,
                             my_github_token="NONE",
                             current_branch="NONE",
                             logger_log_files_prefix="NONE",
-                            logger_sourcetype="NONE"):
+                            logger_sourcetype="NONE",
+                            splunk_python_sdk_install_path="bin",
+                            is_remove_pyc_from_splunklib_dir="true"):
 
     app_dir_path = os.path.join(os.path.dirname(__file__), "test_app_repos", test_app_repo)
     print(f"TestIntegration.setup_action_yml_work -> app_dir_path={app_dir_path}")
@@ -37,6 +39,8 @@ def setup_action_yml(test_app_repo,
     os.environ["SPLUNK_current_branch_name"] = current_branch
     os.environ["SPLUNK_logger_log_files_prefix"] = logger_log_files_prefix
     os.environ["SPLUNK_logger_sourcetype"] = logger_sourcetype
+    os.environ["SPLUNK_splunk_python_sdk_install_path"] = splunk_python_sdk_install_path
+    os.environ["SPLUNK_is_remove_pyc_from_splunklib_dir"] = is_remove_pyc_from_splunklib_dir
 
     try:
         yield

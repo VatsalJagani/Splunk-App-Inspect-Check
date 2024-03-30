@@ -58,6 +58,13 @@ def get_file_permissions(filepath):
     return file_permissions
 
 
+def remove_ds_store_files(directory):
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file == ".DS_Store":
+                os.remove(os.path.join(root, file))
+
+
 class TestAppBuild(unittest.TestCase):
 
     def extract_app_build(self, tgz_file):
@@ -70,10 +77,11 @@ class TestAppBuild(unittest.TestCase):
             with tarfile.open(tgz_file, 'r:gz') as tar:
                 tar.extractall(extract_dir)
 
+            remove_ds_store_files(extract_dir)
+
             # Initialize counters
-            file_count = 0
-            folder_count = 0
             all_files = []
+            all_folders = []
             is_root = True
 
             # Walk through the extracted directory
@@ -82,19 +90,20 @@ class TestAppBuild(unittest.TestCase):
                     is_root = False
                     continue
 
-                folder_count += len(dirs)
-                file_count += len(files)
-
-                # Print relative paths of files
                 for file in files:
                     relative_path = os.path.relpath(os.path.join(root, file), extract_dir)
                     # print("DEBUG: File:", relative_path)
                     all_files.append(relative_path)
 
-            # print("DEBUG: Total Files:", file_count)
-            # print("DEBUG: Total Folders:", folder_count)
-            # print(f"All Files: {all_files}")
-            return file_count, folder_count, all_files
+                for dir in dirs:
+                    relative_path = os.path.relpath(os.path.join(root, dir), extract_dir)
+                    all_folders.append(relative_path)
+
+            print("DEBUG: Total Files:", len(all_files))
+            print("DEBUG: Total Folders:", len(all_folders))
+            print(f"DEBUG: All Files: {all_files}")
+            print(f"DEBUG: All Folders: {all_folders}")
+            return len(all_files), len(all_folders), all_files, all_folders
 
         finally:
             # Cleanup: Remove the temporary extraction directory
@@ -115,7 +124,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_1_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            file_count, folder_count, all_files = self.extract_app_build(app_build_name)
+            file_count, folder_count, all_files, _ = self.extract_app_build(app_build_name)
             assert folder_count == 7
             assert file_count == 10
             assert "my_app_1/static/appIconAlt.png" in all_files
@@ -130,7 +139,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_1_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            file_count, folder_count, all_files = self.extract_app_build(app_build_name)
+            file_count, folder_count, all_files, _ = self.extract_app_build(app_build_name)
             assert folder_count == 7
             assert file_count == 10
             assert "my_app_1/static/appIconAlt.png" in all_files
@@ -151,9 +160,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = app_build_files[0]
             assert os.path.isfile(app_build_name)
 
-            file_count, folder_count, all_files = self.extract_app_build(app_build_name)
-            assert folder_count == 57
-            assert file_count == 362
+            _, _, all_files, all_folders = self.extract_app_build(app_build_name)
             assert "my_app_ucc_1/default/app.conf" in all_files
             assert "my_app_ucc_1/appserver/static/js/build/globalConfig.json" in all_files
             assert "my_app_ucc_1/lib/splunklib/client.py" in all_files
@@ -163,6 +170,11 @@ class TestAppBuild(unittest.TestCase):
             assert all("package/" not in s for s in all_files), "'package' folder should not be present in folder structure of the build."
             assert all("my_app_ucc_1/globalConfig.json" not in s for s in all_files), "'globalConfig.json' file shouldn't be in the root of the App."
             assert all("additional_packaging.py" not in s for s in all_files), "'additional_packaging.py' file shouldn't be part of the App build."
+
+            assert "my_app_ucc_1/lib/splunklib/modularinput" in all_folders
+            assert "my_app_ucc_1/lib/solnlib" in all_folders
+            assert "my_app_ucc_1/appserver/static/js/build" in all_folders
+            assert "my_app_ucc_1/lib/splunktaucclib/common" in all_folders
 
 
     def test_ucc_build_repo_root_as_app_dir(self):
@@ -178,9 +190,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = app_build_files[0]
             assert os.path.isfile(app_build_name)
 
-            file_count, folder_count, all_files = self.extract_app_build(app_build_name)
-            assert folder_count == 57
-            assert file_count == 362
+            _, _, all_files, all_folders = self.extract_app_build(app_build_name)
             assert "my_app_ucc_1/default/app.conf" in all_files
             assert "my_app_ucc_1/appserver/static/js/build/globalConfig.json" in all_files
             assert "my_app_ucc_1/lib/splunklib/client.py" in all_files
@@ -191,6 +201,11 @@ class TestAppBuild(unittest.TestCase):
             assert all("my_app_ucc_1/globalConfig.json" not in s for s in all_files), "'globalConfig.json' file shouldn't be in the root of the App."
             assert all("additional_packaging.py" not in s for s in all_files), "'additional_packaging.py' file shouldn't be part of the App build."
 
+            assert "my_app_ucc_1/lib/splunklib/modularinput" in all_folders
+            assert "my_app_ucc_1/lib/solnlib" in all_folders
+            assert "my_app_ucc_1/appserver/static/js/build" in all_folders
+            assert "my_app_ucc_1/lib/splunktaucclib/common" in all_folders
+
 
     def test_file_permission_check_no_change(self):
         with setup_action_yml("repo_file_permission", app_dir="my_app_2", is_app_inspect_check="false"):
@@ -199,7 +214,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_2_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            _, _, all_files = self.extract_app_build(app_build_name)
+            _, _, all_files, _ = self.extract_app_build(app_build_name)
             assert "my_app_2/bin/file1.sh" in all_files
             assert get_file_permissions("my_app_2/bin/file1.sh") == "rwxr-xr-x"
             assert "my_app_2/bin/file2.sh" in all_files
@@ -217,7 +232,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_2_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            file_count, folder_count, all_files = self.extract_app_build(app_build_name)
+            _, _, all_files, _ = self.extract_app_build(app_build_name)
             assert "my_app_2/bin/file1.sh" in all_files
             assert get_file_permissions("my_app_2/bin/file1.sh") == "rwxr-xr-x"
             assert "my_app_2/bin/file2.sh" in all_files
@@ -235,7 +250,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_2_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            _, _, all_files = self.extract_app_build(app_build_name)
+            _, _, all_files, _ = self.extract_app_build(app_build_name)
             assert "my_app_2/bin/file1.sh" in all_files
             assert get_file_permissions("my_app_2/bin/file1.sh") == "rwxr-xr-x"
             assert "my_app_2/bin/file2.sh" in all_files
@@ -253,7 +268,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_2_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            _, _, all_files = self.extract_app_build(app_build_name)
+            _, _, all_files, _ = self.extract_app_build(app_build_name)
             assert "my_app_2/bin/file1.sh" in all_files
             assert get_file_permissions("my_app_2/bin/file1.sh") == "rwxr-xr-x"
             assert "my_app_2/bin/file2.sh" in all_files
@@ -279,7 +294,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_2_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            _, _, all_files = self.extract_app_build(app_build_name)
+            _, _, all_files, _ = self.extract_app_build(app_build_name)
             assert "my_app_2/bin/file1.sh" in all_files
             assert get_file_permissions("my_app_2/bin/file1.sh") == "rwxr-xr-x"
             assert "my_app_2/bin/file2.sh" in all_files
@@ -305,7 +320,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_2_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            _, _, all_files = self.extract_app_build(app_build_name)
+            _, _, all_files, _ = self.extract_app_build(app_build_name)
             assert "my_app_2/bin/file1.sh" in all_files
             assert get_file_permissions("my_app_2/bin/file1.sh") == "rwxr-xr-x"
             assert "my_app_2/bin/file2.sh" in all_files

@@ -5,10 +5,6 @@ name: Running Python Unit Tests for Splunk-App-Action
 on:
   push:
     branches:
-      - 'develop'
-
-  pull_request:
-    branches:
       - '*'
       - '*/*'
       - '**'
