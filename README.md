@@ -304,6 +304,13 @@ def stream_events(input_script: smi.Script, inputs: smi.InputDefinition, event_w
 * required: false
 * default: "bin"
 
+#### is_remove_pyc_from_splunklib_dir
+* description: "Remove `.pyc` files and `__pycache__` directory from splunk-python-sdk (splunklib) installation path before generating Pull Request. Do not turn this off unless you are facing any issues explicitly."
+* required: false
+* default: true
+
+
+
 
 
 ## Troubleshooting
@@ -328,6 +335,7 @@ def stream_events(input_script: smi.Script, inputs: smi.InputDefinition, event_w
 
 ### v4.1
 * Added `splunk_python_sdk_install_path` parameter for `splunk_python_sdk` utility. Default value is still `bin` folder, but now user can change based on their needs.
+* Avoid `.pyc` files and `__pycache__` files getting into `splunk_python_sdk` installation folder and getting into Pull Request by default. You can turn this off with `is_remove_pyc_from_splunklib_dir` parameter.
 
 
 ### v4
