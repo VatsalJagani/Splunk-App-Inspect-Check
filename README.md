@@ -87,7 +87,7 @@ graph TD
         * Alternatively you can use `Running User Defined Commands Before Generating the final App Build` section here to see how you can assign right permission for your App/Add-on.
     * You can add `to_make_permission_changes: true` parameter to fix the issues with file and folder permissions to avoid App-inspect check automatically.
         ```
-        - uses: VatsalJagani/splunk-app-action4
+        - uses: VatsalJagani/splunk-app-action@v4
           with:
             app_dir: "my_app"
             to_make_permission_changes: true
@@ -125,7 +125,7 @@ graph TD
     * It allows you to run command before building the App build.
         * This could be useful if you wish to remove some files that you don't want in the build, change permission of some files before running the rest of the app build or app-inspect check.
         ```
-        - uses: VatsalJagani/splunk-app-action4
+        - uses: VatsalJagani/splunk-app-action@v4
           env:
             SPLUNK_APP_ACTION_1: "rm -rf extra_test_folder"
           with:
@@ -148,7 +148,7 @@ graph TD
 * It requires to set inputs: splunkbase_username and splunkbase_password.
 
 ```
-- uses: VatsalJagani/splunk-app-action4
+- uses: VatsalJagani/splunk-app-action@v4
   with:
     app_dir: "my_app"
     splunkbase_username: ${{ secrets.SPLUNKBASE_USERNAME }}
@@ -165,7 +165,7 @@ graph TD
 #### `whats_in_the_app` - Utility that adds information about the App inside the README.md file
 * The splunk-app-action has utility which automatically adds information about the App, like how many alerts does it have, how many dashboards does it have, etc inside the App's README.md file.
 ```
-- uses: VatsalJagani/splunk-app-action4
+- uses: VatsalJagani/splunk-app-action@v4
   with:
     app_dir: "my_app"
     app_utilities: "whats_in_the_app"
@@ -176,7 +176,7 @@ graph TD
 * Auto adds python logger manager, including python file necessary, props.conf to assign right sourcetype for it under the internal logs.
 
 ```
-- uses: VatsalJagani/splunk-app-action4
+- uses: VatsalJagani/splunk-app-action@v4
   with:
     app_dir: "my_app"
     app_utilities: "logger"
@@ -360,7 +360,7 @@ def stream_events(input_script: smi.Script, inputs: smi.InputDefinition, event_w
         ```
         * to
         ```
-        - uses: VatsalJagani/splunk-app-action4
+        - uses: VatsalJagani/splunk-app-action@v4
           env:
             SPLUNK_APP_ACTION_1: "rm -rf extra_test_folder"
             SPLUNK_APP_ACTION_2: "cat 'abc,123' >> lookups/my_custom_lookup.csv"
