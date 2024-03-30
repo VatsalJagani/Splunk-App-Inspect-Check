@@ -214,7 +214,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_2_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            _, _, all_files, all_folders = self.extract_app_build(app_build_name)
+            _, _, all_files, _ = self.extract_app_build(app_build_name)
             assert "my_app_2/bin/file1.sh" in all_files
             assert get_file_permissions("my_app_2/bin/file1.sh") == "rwxr-xr-x"
             assert "my_app_2/bin/file2.sh" in all_files
@@ -232,7 +232,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_2_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            file_count, folder_count, all_files, all_folders = self.extract_app_build(app_build_name)
+            _, _, all_files, _ = self.extract_app_build(app_build_name)
             assert "my_app_2/bin/file1.sh" in all_files
             assert get_file_permissions("my_app_2/bin/file1.sh") == "rwxr-xr-x"
             assert "my_app_2/bin/file2.sh" in all_files
@@ -250,7 +250,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_2_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            _, _, all_files, all_folders = self.extract_app_build(app_build_name)
+            _, _, all_files, _ = self.extract_app_build(app_build_name)
             assert "my_app_2/bin/file1.sh" in all_files
             assert get_file_permissions("my_app_2/bin/file1.sh") == "rwxr-xr-x"
             assert "my_app_2/bin/file2.sh" in all_files
@@ -268,7 +268,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_2_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            _, _, all_files, all_folders = self.extract_app_build(app_build_name)
+            _, _, all_files, _ = self.extract_app_build(app_build_name)
             assert "my_app_2/bin/file1.sh" in all_files
             assert get_file_permissions("my_app_2/bin/file1.sh") == "rwxr-xr-x"
             assert "my_app_2/bin/file2.sh" in all_files
@@ -294,7 +294,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_2_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            _, _, all_files, all_folders = self.extract_app_build(app_build_name)
+            _, _, all_files, _ = self.extract_app_build(app_build_name)
             assert "my_app_2/bin/file1.sh" in all_files
             assert get_file_permissions("my_app_2/bin/file1.sh") == "rwxr-xr-x"
             assert "my_app_2/bin/file2.sh" in all_files
@@ -320,7 +320,7 @@ class TestAppBuild(unittest.TestCase):
             app_build_name = "my_app_2_1_1_2_1.tgz"
             assert os.path.isfile(app_build_name)
 
-            _, _, all_files, all_folders = self.extract_app_build(app_build_name)
+            _, _, all_files, _ = self.extract_app_build(app_build_name)
             assert "my_app_2/bin/file1.sh" in all_files
             assert get_file_permissions("my_app_2/bin/file1.sh") == "rwxr-xr-x"
             assert "my_app_2/bin/file2.sh" in all_files
