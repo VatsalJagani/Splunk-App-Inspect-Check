@@ -188,6 +188,7 @@ graph TD
 #### `splunk_python_sdk` - Add Splunklib or Splunk SDK for Python and Auto Upgrades It
 * This utility adds the splunklib or Splunk SDK for Python to the App and auto upgrades it whenever new version is available.
 
+Example-1
 ```
 - uses: VatsalJagani/splunk-app-action@v3
   with:
@@ -195,6 +196,17 @@ graph TD
     app_utilities: "splunk_python_sdk"
     my_github_token: ${{ secrets.MY_GITHUB_TOKEN }}
 ```
+
+Example-2
+```
+- uses: VatsalJagani/splunk-app-action@v3
+  with:
+    app_dir: "my_app"
+    app_utilities: "splunk_python_sdk"
+    my_github_token: ${{ secrets.MY_GITHUB_TOKEN }}
+    splunk_python_sdk_install_path: "bin/lib"
+```
+
 
 #### `common_js_utilities` - Add Common JavaScript Utilities File
 * This utility adds a JavaScript file that contains commonly used functionality for a JavaScript code for a Splunk App.
@@ -287,6 +299,11 @@ def stream_events(input_script: smi.Script, inputs: smi.InputDefinition, event_w
 * description: "Sourcetype for the internal app logs. Required only for logger utility."
 * required: false
 
+#### splunk_python_sdk_install_path
+* description: "Path where you would like to install splunk-python-sdk (splunklib). Path is relative to App's root folder."
+* required: false
+* default: "bin"
+
 
 
 ## Troubleshooting
@@ -308,6 +325,10 @@ def stream_events(input_script: smi.Script, inputs: smi.InputDefinition, event_w
 
 
 ## Release Notes
+
+### v4.1
+* Added `splunk_python_sdk_install_path` parameter for `splunk_python_sdk` utility. Default value is still `bin` folder, but now user can change based on their needs.
+
 
 ### v4
 * Run the user-defined commands in the context of your App's root directory instead of Repo's root directory. Refer to `Running User Defined Commands Before Generating the final App Build` for more details.

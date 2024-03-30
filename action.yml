@@ -54,6 +54,11 @@ inputs:
     required: false
     default: "NONE"
 
+  splunk_python_sdk_install_path:
+    description: "Path where you would like to install splunk-python-sdk (splunklib). Path is relative to App's root folder."
+    required: false
+    default: "bin"
+
 outputs:
   stdout:
     description: "Program stdout"
@@ -92,6 +97,7 @@ runs:
         echo "current_branch_name -> ${{steps.extract_branch.outputs.branch}}"
         echo "logger_log_files_prefix -> ${{inputs.logger_log_files_prefix}}"
         echo "logger_sourcetype -> ${{inputs.logger_sourcetype}}"
+        echo "splunk_python_sdk_install_path -> ${{inputs.splunk_python_sdk_install_path}}"
 
     - name: "Install Python"
       uses: actions/setup-python@v5
@@ -118,6 +124,7 @@ runs:
         SPLUNK_current_branch_name: ${{steps.extract_branch.outputs.branch}}
         SPLUNK_logger_log_files_prefix: ${{inputs.logger_log_files_prefix}}
         SPLUNK_logger_sourcetype: ${{inputs.logger_sourcetype}}
+        SPLUNK_splunk_python_sdk_install_path: ${{inputs.splunk_python_sdk_install_path}}
       run: |
         python -u ${{ github.action_path }}/src/main.py
 

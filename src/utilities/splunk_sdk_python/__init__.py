@@ -22,8 +22,13 @@ class SplunkPythonSDKUtility(BaseUtility):
     def implement_utility(self):
         utils.info("Adding SplunkPythonSDKUtility")
 
+        splunk_python_sdk_install_path = utils.get_input('splunk_python_sdk_install_path')
+        utils.info(f"splunk_python_sdk_install_path: {splunk_python_sdk_install_path}")
+        if not splunk_python_sdk_install_path or splunk_python_sdk_install_path == "NONE":
+            splunk_python_sdk_install_path = "bin"
+
         folder_to_install_splunklib = os.path.join(
-            self.app_write_dir, 'bin')
+            self.app_write_dir, splunk_python_sdk_install_path)
 
         if not os.path.exists(folder_to_install_splunklib):
             os.mkdir(folder_to_install_splunklib)
