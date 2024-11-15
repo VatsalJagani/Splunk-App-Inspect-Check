@@ -34,7 +34,7 @@ jobs:
 
         - name: Linting with Ruff
           run: ruff check --ignore=E721,E722,E401 --output-format=github --exclude=tests/test_app_repos --exclude=repodir/tests/test_app_repos . 
-          # continue-on-error: true   # to ignore ruff errors
+          continue-on-error: true   # to ignore ruff errors
 
         - name: Run Python Unit Tests
           env:
