@@ -234,6 +234,16 @@ Example-2
     * Create `Input Handler` files with starter code.
         * This file will not get override, because developer suppose to make changes into this file to collect the input data.
 
+* Manually add below two parameters under each `inputs > services` section inside `globalConfig.json` file.
+
+```
+"restHandlerModule": "ucc_ta_helper",
+"restHandlerClass": "UCCTACustomInputRestHandler",
+```
+
+    * This will handle checkpoint removal when user deletes the input.
+    * This will avoid checkpoint conflicts when user deletes the input and re-create with the same name.
+
 ```
 - uses: VatsalJagani/splunk-app-action@v4
   with:
