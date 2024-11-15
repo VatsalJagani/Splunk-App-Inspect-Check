@@ -173,18 +173,20 @@ class UCCTAInput:
 
         - write_event() - keeps changing based on the input being processed
     '''
-    def __init__(self, input_script: smi.Script) -> None:
+    def __init__(self, input_script: smi.Script, definition: smi.ValidationDefinition = None) -> None:
         self.input_script = input_script
-        self.session_key = input_script._input_definition.metadata["session_key"]
 
-        log_level = get_ucc_ta_log_level(self.session_key)
-        self.logger = logger_manager.setup_logging(self.normalized_input_name, log_level)
-        self.logger.info(f"Logger initiated. Logging level = {log_level}")
+        if input_script._input_definition:
+            self.session_key = input_script._input_definition.metadata["session_key"]
+        else:
+            self.session_key = definition.metadata["session_key"]
 
+        self.log_level = get_ucc_ta_log_level(self.session_key)
         self.ucc_ta_settings = get_ucc_ta_settings(self.session_key)
-
         # self.proxy_settings = get_proxy_settings(session_key, self.logger) # TODO
         self.proxy_settings = None
+
+        self.logger = logger_manager.setup_logging("generic_input", self.log_level)
 
 
     def validate_input(self, definition: smi.ValidationDefinition):
@@ -196,18 +198,21 @@ class UCCTAInput:
         for input_name, input_details in inputs.inputs.items():
             normalized_input_name = input_name.split("/")[-1]
 
-            try:
-                self.logger.info(f'Modular input "{normalized_input_name}" started.')
+            logger = logger_manager.setup_logging(normalized_input_name, self.log_level)
+            logger.info(f"Logger initiated. Logging level = {self.log_level}")
 
-                self.logger.debug(f"input_name={input_name}, input_item={input_details}")
+            try:
+                logger.info(f'Modular input "{normalized_input_name}" started.')
+
+                logger.debug(f"input_name={input_name}, input_item={input_details}")
 
                 account_name = input_details.get('account')
-                account_details = get_ucc_ta_account_details(self.session_key, self.logger, account_name)
+                account_details = get_ucc_ta_account_details(self.session_key, logger, account_name)
 
-                input_checkpointer = UCCTAInputCheckpointer(self.session_key, self.logger, normalized_input_name)
+                input_checkpointer = UCCTAInputCheckpointer(self.session_key, logger, normalized_input_name)
 
                 # Create event writer for this Input
-                def write_event(data, timestamp, index=None, sourcetype=None, source=None):
+                def write_event(data, timestamp=None, index=None, sourcetype=None, source=None):
                     _index = index if index else input_details.get("index")
                     _sourcetype = index if sourcetype else input_details.get("sourcetype")
                     _source = index if source else input_details.get("source")
@@ -226,11 +231,11 @@ class UCCTAInput:
                 # so it has all the necessary parameters, so user don't have to pass the parameters
 
                 self.collect(input_name, normalized_input_name, input_details, account_details, input_checkpointer, event_writer)
-                self.logger.info(f'Modular input "{normalized_input_name}" ended.')
+                logger.info(f'Modular input "{normalized_input_name}" ended.')
 
             except Exception as e:
-                self.logger.error(
-                    f'Exception raised while ingesting data for input="{self.normalized_input_name}" {e}. Traceback: {traceback.format_exc()}'
+                logger.error(
+                    f'Exception raised while ingesting data for input="{normalized_input_name}" {e}. Traceback: {traceback.format_exc()}'
                 )
 
 

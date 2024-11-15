@@ -69,7 +69,7 @@ def modify_original_input_py_file(addon_name, input_name):
 
     # Update validate_input method
     pattern_validate_input_fun = r"def validate_input[\w\W]*return\n"
-    replacement_content_validate_input_fun = f"def validate_input(self, definition: smi.ValidationDefinition):\n        {input_class_name}(self).validate_input(definition)\n\n"
+    replacement_content_validate_input_fun = f"def validate_input(self, definition: smi.ValidationDefinition):\n        {input_class_name}(self, definition).validate_input(definition)\n\n"
 
     file_content = re.sub(pattern_validate_input_fun, replacement_content_validate_input_fun, file_content)
 
