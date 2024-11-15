@@ -65,10 +65,10 @@ def get_all_input_names(gc):
 
 
 
-class UCCHelperUtility(BaseUtility):
+class UCCAdditionalPackagingUtility(BaseUtility):
 
     def implement_utility(self):
-        utils.info("Adding UCCHelperUtility")
+        utils.info("Adding UCCAdditionalPackagingUtility")
         app_dir_path = os.path.dirname(self.app_write_dir)   # additional_packaging.py file has to be in the app_dir folder of the repo instead of in the package folder
         bin_folder_path = os.path.join(self.app_write_dir, "bin")
 
