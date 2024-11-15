@@ -46,7 +46,7 @@ def _util_generate_input_class_name(input_name):
     # Ensure the class name starts with a capital letter
     camel_case_name = camel_case_name[0].upper() + camel_case_name[1:]
 
-    return camel_case_name
+    return f"{camel_case_name}Handler"
 
 
 def modify_original_input_py_file(addon_name, input_name):
