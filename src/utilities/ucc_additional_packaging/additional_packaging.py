@@ -53,16 +53,19 @@ def modify_original_input_py_file(addon_name, input_name):
     file_path = os.path.join('output', addon_name, 'bin', f'{input_name}.py')
     with open(file_path, "r") as f:
         file_content = f.read()
-    
+
     input_class_name = _util_generate_input_class_name(input_name)
 
-    # Insert import statement for your modular input
-    file_content = re.sub(
-        r"(?m)^(import[^\n]*)$(?!.*^import[^\n]*)",
-        r"\1\from " + input_name + "_handler import " + input_class_name,
-        file_content,
-        flags=re.DOTALL
-    )
+    input_class_import_statement = f"from {input_name}_handler import {input_class_name}"
+
+    if input_class_import_statement not in file_content:
+        # Only add import if not present already
+        file_content = re.sub(
+            r"^(import\s+import_declare_test.*)$",
+            r"\1\n" + input_class_import_statement,
+            file_content,
+            flags=re.MULTILINE
+        )
 
     # Update validate_input method
     pattern_validate_input_fun = r"def validate_input[\w\W]*return\n"
