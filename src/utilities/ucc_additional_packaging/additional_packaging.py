@@ -36,30 +36,17 @@ def get_all_input_names(addon_name):
     return get_all_stanzas(os.path.join('output', addon_name, 'default', 'inputs.conf'))
 
 
-def generate_input_handler_file(addon_name, input_name):
-    _file_path = os.path.join('output', addon_name, 'bin', f'{input_name}_handler.py')
+def _util_generate_input_class_name(input_name):
+    # Replace all non-alphanumeric characters (including spaces, hyphens, etc.) with underscores
+    input_name = re.sub(r'[^a-zA-Z0-9]', '_', input_name)
+    # Split the string by underscores
+    words = input_name.split('_')
+    # Capitalize the first letter of each word except the first one
+    camel_case_name = words[0] + ''.join(word.capitalize() for word in words[1:])
+    # Ensure the class name starts with a capital letter
+    camel_case_name = camel_case_name[0].upper() + camel_case_name[1:]
 
-    if os.path.exists(_file_path):
-        print(f"Input handler python file for {input_name} already created by user ignoring.")
-        return
-    else:
-        print(f"Creating input handler python file for {input_name}.")
-
-    _content = """
-from splunklib import modularinput as smi
-
-
-def validate_input(input_script: smi.Script, definition: smi.ValidationDefinition):
-    return
-
-
-def stream_events(input_script: smi.Script, inputs: smi.InputDefinition, event_writer: smi.EventWriter):
-    return
-
-"""
-
-    with open(_file_path, 'w') as f:
-        f.write(_content)
+    return camel_case_name
 
 
 def modify_original_input_py_file(addon_name, input_name):
@@ -67,33 +54,27 @@ def modify_original_input_py_file(addon_name, input_name):
     with open(file_path, "r") as f:
         file_content = f.read()
     
-    # print(f"file_content1 = {file_content}")
+    input_class_name = _util_generate_input_class_name(input_name)
 
     # Insert import statement for your modular input
     file_content = re.sub(
         r"(?m)^(import[^\n]*)$(?!.*^import[^\n]*)",
-        r"\1\nimport " + input_name + "_handler",
+        r"\1\from " + input_name + "_handler import " + input_class_name,
         file_content,
         flags=re.DOTALL
     )
 
-    # print(f"file_content2 = {file_content}")
-
     # Update validate_input method
     pattern_validate_input_fun = r"def validate_input[\w\W]*return\n"
-    replacement_content_validate_input_fun = f"def validate_input(self, definition: smi.ValidationDefinition):\n        {input_name}_handler.validate_input(self, definition)\n\n"
+    replacement_content_validate_input_fun = f"def validate_input(self, definition: smi.ValidationDefinition):\n        {input_class_name}(self).validate_input(definition)\n\n"
 
     file_content = re.sub(pattern_validate_input_fun, replacement_content_validate_input_fun, file_content)
 
-    # print(f"file_content3 = {file_content}")
-
     # Update stream_events method
     pattern_stream_events_fun = r"def stream_events[\w\W]*(?:\n\n)"
-    replacement_content_stream_events_fun = f"def stream_events(self, inputs: smi.InputDefinition, event_writer: smi.EventWriter):\n        {input_name}_handler.stream_events(self, inputs, event_writer)\n\n\n"
+    replacement_content_stream_events_fun = f"def stream_events(self, inputs: smi.InputDefinition, event_writer: smi.EventWriter):\n        {input_class_name}(self).stream_events(inputs, event_writer)\n\n\n"
 
     file_content = re.sub(pattern_stream_events_fun, replacement_content_stream_events_fun, file_content)
-
-    # print(f"file_content4 = {file_content}")
 
     with open(file_path, "w") as f:
         f.write(file_content)
@@ -105,5 +86,4 @@ def additional_packaging(addon_name):
     # Iterate over all inputs available
     for i in get_all_input_names(addon_name):
         print(f"Processing Input={i}")
-        generate_input_handler_file(addon_name, i)
         modify_original_input_py_file(addon_name, i)

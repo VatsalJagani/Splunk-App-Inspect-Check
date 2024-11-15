@@ -71,6 +71,7 @@ graph TD
     * Reference - [https://splunk.github.io/addonfactory-ucc-generator/](https://splunk.github.io/addonfactory-ucc-generator/)
     * The `app_dir` folder must have a sub-folder named `package`, and a file named `globalConfig.json` for this to work.
     * You need to use `ucc-gen init` command locally first to initial the Add-on/Repository before using this or `ucc-gen build` command. See [documentation of UCC Framework](https://splunk.github.io/addonfactory-ucc-generator/quickstart/).
+    * Also, its good idea to put `<package>/output/**` directory into `.gitignore` file when using ucc based Add-ons.
     ```
     - uses: VatsalJagani/splunk-app-action@3
       with:
@@ -219,16 +220,29 @@ Example-2
     my_github_token: ${{ secrets.MY_GITHUB_TOKEN }}
 ```
 
-#### `ucc_additional_packaging` - Add additional_packaging.py file for UCC built Add-on
-* This utility adds additional_packaging.py file that contains code to better generate input handler python file to easily re-generate code on change, rather than making manual changes.
+#### `ucc_additional_packaging` - Add additional_packaging.py file, ucc_ta_helper.py file and generate Input Handler files which is much simplified for UCC built Add-ons
+
+* This utility requires logger utility as **dependency**.
+
+* This utility does following changes and generate PR on GitHub:
+    * Adds `ucc_ta_helper.py` file inside the bin folder of the `package` folder, which contains many useful functions that can be used by developer to write Input handler collect method.
+        * This file will override if there is new/changed content.
+
+    * Adds `additional_packaging.py` file which that contains code to ask UCC to how to generate Add-on build. This will update UCC generated code to support for simpler input handler files.
+        * This file will override if there is new/changed content.
+
+    * Create `Input Handler` files with starter code.
+        * This file will not get override, because developer suppose to make changes into this file to collect the input data.
 
 ```
 - uses: VatsalJagani/splunk-app-action@v4
   with:
     app_dir: "."
     use_ucc_gen: true
-    app_utilities: "ucc_additional_packaging"
+    app_utilities: "logger, ucc_additional_packaging"
     my_github_token: ${{ secrets.MY_GITHUB_TOKEN }}
+    logger_log_files_prefix: "my_app"
+    logger_sourcetype: "my_app:logs"
 ```
 
 * The input file in which you need to write code is `<Input_Name>_handler.py`. And it would start with below content and you need to copy into your `package/bin` folder and write code into it to collect the data and ingest into Splunk.
