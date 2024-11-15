@@ -330,12 +330,15 @@ def stream_events(input_script: smi.Script, inputs: smi.InputDefinition, event_w
 * required: false
 * default: "bin"
 
-#### is_remove_pyc_from_splunklib_dir
-* description: "Remove `.pyc` files and `__pycache__` directory from splunk-python-sdk (splunklib) installation path before generating Pull Request. Do not turn this off unless you are facing any issues explicitly."
+#### remove_pyc_before_commit
+* description: "Remove `.pyc` files and `__pycache__` directory from the repository before generating Pull Request. Do not turn this off unless you are facing any issues explicitly."
 * required: false
 * default: true
 
 
+### Removed Parameters in v5
+* is_remove_pyc_from_splunklib_dir
+    * Use remove_pyc_before_commit instead.
 
 
 

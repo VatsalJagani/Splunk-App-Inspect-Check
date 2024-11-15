@@ -38,10 +38,6 @@ class SplunkPythonSDKUtility(BaseUtility):
         if not splunk_python_sdk_install_path or splunk_python_sdk_install_path == "NONE":
             splunk_python_sdk_install_path = "bin"
 
-        is_remove_pyc_from_splunklib_dir = utils.str_to_boolean_default_true(
-            utils.get_input('is_remove_pyc_from_splunklib_dir'))
-        utils.info(f"is_remove_pyc_from_splunklib_dir: {is_remove_pyc_from_splunklib_dir}")
-
         folder_to_install_splunklib = os.path.join(
             self.app_write_dir, splunk_python_sdk_install_path)
 
@@ -74,10 +70,6 @@ class SplunkPythonSDKUtility(BaseUtility):
                 f"splunklib not present under {folder_to_install_splunklib} directory of the App, installing...")
             utils.execute_system_command(
                 f'pip install splunk-sdk --target "{folder_to_install_splunklib}"')
-
-        # Removing .pyc and __pycache__
-        if is_remove_pyc_from_splunklib_dir:
-            self.remove_pycache(folder_to_install_splunklib)
 
         new_version = self._get_splunklib_version(init_file)
         utils.info(f"New splunklib version = {new_version}")

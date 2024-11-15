@@ -59,8 +59,8 @@ inputs:
     required: false
     default: "bin"
 
-  is_remove_pyc_from_splunklib_dir:
-    description: "Remove `.pyc` files and `__pycache__` directory from splunk-python-sdk (splunklib) installation path before generating Pull Request. Do not turn this off unless you are facing any issues explicitly."
+  remove_pyc_before_commit:
+    description: "Remove `.pyc` files and `__pycache__` directory from the repository before generating Pull Request. Do not turn this off unless you are facing any issues explicitly."
     required: false
     default: true
 
@@ -104,7 +104,7 @@ runs:
         echo "logger_log_files_prefix -> ${{inputs.logger_log_files_prefix}}"
         echo "logger_sourcetype -> ${{inputs.logger_sourcetype}}"
         echo "splunk_python_sdk_install_path -> ${{inputs.splunk_python_sdk_install_path}}"
-        echo "is_remove_pyc_from_splunklib_dir -> ${{inputs.is_remove_pyc_from_splunklib_dir}}"
+        echo "remove_pyc_before_commit -> ${{inputs.remove_pyc_before_commit}}"
 
     - name: "Install Python"
       uses: actions/setup-python@v5
@@ -132,7 +132,7 @@ runs:
         SPLUNK_logger_log_files_prefix: ${{inputs.logger_log_files_prefix}}
         SPLUNK_logger_sourcetype: ${{inputs.logger_sourcetype}}
         SPLUNK_splunk_python_sdk_install_path: ${{inputs.splunk_python_sdk_install_path}}
-        SPLUNK_is_remove_pyc_from_splunklib_dir: ${{inputs.is_remove_pyc_from_splunklib_dir}}
+        SPLUNK_remove_pyc_before_commit: ${{inputs.remove_pyc_before_commit}}
       run: |
         python -u ${{ github.action_path }}/src/main.py
 

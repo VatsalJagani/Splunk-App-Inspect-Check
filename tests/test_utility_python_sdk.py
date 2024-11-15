@@ -36,7 +36,7 @@ def test_splunk_sdk_utility_installed_new_2():
     with get_temp_directory() as temp_dir:
         with setup_temporary_env_vars({
             "SPLUNK_splunk_python_sdk_install_path": "lib",
-            "SPLUNK_is_remove_pyc_from_splunklib_dir": "true"
+            "SPLUNK_remove_pyc_before_commit": "true"
         }):
             sdk_utility = SplunkPythonSDKUtility("nothing", temp_dir)
             result = sdk_utility.implement_utility()
@@ -162,7 +162,7 @@ def test_splunk_sdk_utility_skipped_due_to_existing_and_same_version_2():
 def test_splunk_sdk_utility_error_upgrading_existing():
     with get_temp_directory() as temp_dir:
         with setup_temporary_env_vars({
-            "SPLUNK_is_remove_pyc_from_splunklib_dir": "true",
+            "SPLUNK_remove_pyc_before_commit": "true",
         }):
             # Prepare the temporary directory
             folder_path = os.path.join(temp_dir, 'bin')
