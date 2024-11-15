@@ -1,7 +1,6 @@
 
 import os
 import re
-import shutil
 
 import helpers.github_action_utils as utils
 from utilities.base_utility import BaseUtility
@@ -18,16 +17,6 @@ class SplunkPythonSDKUtility(BaseUtility):
                 return version
         except:
             utils.info("Error with getting the splunklib version.")
-
-
-    def remove_pycache(self, directory):
-        for root, dirs, files in os.walk(directory):
-            for file in files:
-                if file.endswith(".pyc"):
-                    os.remove(os.path.join(root, file))
-            for dir in dirs:
-                if dir == "__pycache__":
-                    shutil.rmtree(os.path.join(root, dir))
 
 
     def implement_utility(self):

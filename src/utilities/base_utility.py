@@ -1,5 +1,6 @@
 
 import os
+import shutil
 from helpers.git_manager import GitHubPR, get_file_hash, get_multi_files_hash, get_folder_hash
 import helpers.github_action_utils as utils
 from helpers.global_variables import GlobalVariables
@@ -9,6 +10,16 @@ class BaseUtility:
     def __init__(self, app_read_dir, app_write_dir) -> None:
         self.app_read_dir = app_read_dir
         self.app_write_dir = app_write_dir
+
+
+    def remove_pycache(self, directory):
+        for root, dirs, files in os.walk(directory):
+            for file in files:
+                if file.endswith(".pyc"):
+                    os.remove(os.path.join(root, file))
+            for dir in dirs:
+                if dir == "__pycache__":
+                    shutil.rmtree(os.path.join(root, dir))
 
 
     def add(self):
@@ -31,12 +42,12 @@ class BaseUtility:
                 else:
                     utils.error("File to generate hash is invalid.")
 
-            self.remove_pyc_before_commit = utils.str_to_boolean_default_true(
+            remove_pyc_before_commit = utils.str_to_boolean_default_true(
                 utils.get_input('remove_pyc_before_commit'))
-            utils.info(f"remove_pyc_before_commit: {self.remove_pyc_before_commit}")
+            utils.info(f"remove_pyc_before_commit: {remove_pyc_before_commit}")
 
             # Removing .pyc and __pycache__
-            if self.remove_pyc_before_commit:
+            if remove_pyc_before_commit:
                 self.remove_pycache(GlobalVariables.ORIGINAL_APP_DIR_PATH)
 
             if hash:
