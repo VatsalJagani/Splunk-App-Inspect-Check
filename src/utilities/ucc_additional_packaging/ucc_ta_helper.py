@@ -214,8 +214,8 @@ class UCCTAInput:
                 # Create event writer for this Input
                 def write_event(data, timestamp=None, index=None, sourcetype=None, source=None):
                     _index = index if index else input_details.get("index")
-                    _sourcetype = index if sourcetype else input_details.get("sourcetype")
-                    _source = index if source else input_details.get("source")
+                    _sourcetype = sourcetype if sourcetype else input_details.get("sourcetype")
+                    _source = source if source else input_details.get("source")
 
                     if type(data) is dict:
                         data = json.dumps(data)
