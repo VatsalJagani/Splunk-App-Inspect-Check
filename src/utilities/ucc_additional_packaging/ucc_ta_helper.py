@@ -217,6 +217,9 @@ class UCCTAInput:
                     _sourcetype = index if sourcetype else input_details.get("sourcetype")
                     _source = index if source else input_details.get("source")
 
+                    if type(data) is dict:
+                        data = json.dumps(data)
+
                     event_writer.write_event(
                         smi.Event(
                             time=timestamp,
