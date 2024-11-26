@@ -222,6 +222,13 @@ Example-2
 
 #### `ucc_additional_packaging` - Add additional_packaging.py file, ucc_ta_helper.py file and generate Input Handler files which is much simplified for UCC built Add-ons
 
+* **NOTE** - Do not use this for any existing Add-on built with UCC as many features of this functionality requires code change. Thoroughly test the new build of the Add-on if using this utility with any functionality that everything works as expected.
+
+* This utility does not initialize the UCC add-on, hence user needs to manually initiate the `ucc init` command.
+    ```
+    ucc-gen init --addon-name "demo_addon_for_splunk" --addon-display-name "Demo Add-on for Splunk" --addon-input-name demo_input
+    ```
+
 * This utility requires logger utility as **dependency**.
 
 * This utility does following changes and generate PR on GitHub:
