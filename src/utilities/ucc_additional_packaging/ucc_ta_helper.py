@@ -5,6 +5,7 @@ import os
 import json
 import logging
 import traceback
+from urllib.parse import quote_plus
 
 import import_declare_test
 
@@ -78,7 +79,7 @@ def get_ucc_ta_log_level(session_key: str):
 
 
 
-def get_ucc_ta_account_details(session_key: str, logger, account_name: str):
+def get_ucc_ta_account_details(session_key: str, account_name: str):
     cfm = conf_manager.ConfManager(
         session_key,
         ADDON_NAME,
@@ -86,6 +87,48 @@ def get_ucc_ta_account_details(session_key: str, logger, account_name: str):
     )
     account_conf_file = cfm.get_conf(f"{NORMALIZED_ADDON_NAME}_account")
     return account_conf_file.get(account_name)
+
+
+
+def get_proxy_settings(session_key):
+    """
+    This function fetches proxy settings
+    :param session_key: session key for particular modular input
+    :return : proxy settings
+    """
+    ta_settings = get_ucc_ta_settings(session_key)
+
+    if "proxy" in ta_settings and ta_settings["proxy"]:
+        proxy_settings = None
+        proxy_stanza = {}
+        for key, value in ta_settings["proxy"].items():
+            proxy_stanza[key] = value
+
+        if int(proxy_stanza.get("proxy_enabled", 0)) == 0:
+            return proxy_settings
+
+        proxy_port = proxy_stanza.get('proxy_port')
+        proxy_url = proxy_stanza.get('proxy_url')
+        proxy_type = proxy_stanza.get('proxy_type')
+        proxy_username = proxy_stanza.get('proxy_username', '')
+        proxy_password = proxy_stanza.get('proxy_password', '')
+
+        if proxy_username and proxy_password:
+            proxy_username = quote_plus(proxy_username)
+            proxy_password = quote_plus(proxy_password)
+            proxy_uri = "%s://%s:%s@%s:%s" % (proxy_type, proxy_username,
+                                            proxy_password, proxy_url, proxy_port)
+        else:
+            proxy_uri = "%s://%s:%s" % (proxy_type, proxy_url, proxy_port)
+
+        proxy_settings = {
+            "http": proxy_uri,
+            "https": proxy_uri
+        }
+        return proxy_settings
+
+    else:
+        return None
 
 
 
@@ -183,10 +226,14 @@ class UCCTAInput:
 
         self.log_level = get_ucc_ta_log_level(self.session_key)
         self.ucc_ta_settings = get_ucc_ta_settings(self.session_key)
-        # self.proxy_settings = get_proxy_settings(session_key, self.logger) # TODO
-        self.proxy_settings = None
 
         self.logger = logger_manager.setup_logging("generic_input", self.log_level)
+
+        self.proxy_settings = get_proxy_settings(self.session_key)
+        if self.proxy_settings:
+            self.logger.info("Using proxy settings configured by user.")
+        else:
+            self.logger.info("No proxy configured.")
 
 
     def validate_input(self, definition: smi.ValidationDefinition):
@@ -207,7 +254,7 @@ class UCCTAInput:
                 logger.debug(f"input_name={input_name}, input_item={input_details}")
 
                 account_name = input_details.get('account')
-                account_details = get_ucc_ta_account_details(self.session_key, logger, account_name)
+                account_details = get_ucc_ta_account_details(self.session_key, account_name)
 
                 input_checkpointer = UCCTAInputCheckpointer(self.session_key, logger, normalized_input_name)
 
